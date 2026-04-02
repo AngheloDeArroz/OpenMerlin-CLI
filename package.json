@@ -1,0 +1,29 @@
+{
+  "name": "termilynx",
+  "version": "1.0.0",
+  "description": "Production CLI coding agent — connects to any AI API",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "termilynx": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "diff": "^5.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0",
+    "@types/diff": "^5.0.0",
+    "tsx": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}
