@@ -63,7 +63,7 @@ export function planStep(index: number, step: string): void {
 export function banner(cwd: string, modelInfo?: { provider: string; model: string }): void {
   console.log('');
   console.log(chalk.bold.cyan('  ╔═══════════════════════════════╗'));
-  console.log(chalk.bold.cyan('  ║       termilynx CLI           ║'));
+  console.log(chalk.bold.cyan('  ║       OpenMerlin CLI          ║'));
   console.log(chalk.bold.cyan('  ╚═══════════════════════════════╝'));
   console.log(chalk.dim(`  Project: ${cwd}`));
   if (modelInfo) {
@@ -92,8 +92,8 @@ export function showHelp(): void {
   console.log(chalk.white('    config        ') + chalk.dim('  — Open full configuration menu'));
   console.log(chalk.white('    clear         ') + chalk.dim('  — Clear conversation history'));
   console.log(chalk.white('    help          ') + chalk.dim('  — Show this help'));
-  console.log(chalk.white('    exit / quit   ') + chalk.dim('  — Exit TermiLynx'));
+  console.log(chalk.white('    exit / quit   ') + chalk.dim('  — Exit OpenMerlin-CLI'));
   console.log('');
-  console.log(chalk.dim('  Or just type what you want TermiLynx to do!'));
+  console.log(chalk.dim('  Or just type what you want OpenMerlin-CLI to do!'));
   console.log('');
 }

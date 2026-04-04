@@ -585,7 +585,7 @@ export async function promptForStartupConfig(): Promise<Config> {
 
   // No profiles at all — run first-time setup
   if (!configFile || configFile.profiles.length === 0) {
-    console.log('\n  Welcome to TermiLynx!\n');
+    console.log('\n  Welcome to OpenMerlin-CLI!\n');
     return await promptForConfig();
   }
 

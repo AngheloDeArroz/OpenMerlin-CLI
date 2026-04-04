@@ -1,6 +1,6 @@
-# TermiLynx
+# OpenMerlin-CLI
 
-TermiLynx is a terminal-first coding agent for real project folders. It connects to an LLM provider, scans your codebase for context, and executes tool calls with explicit safety confirmations for writes and shell commands.
+OpenMerlin-CLI is a terminal-first coding agent for real project folders. It connects to an LLM provider, scans your codebase for context, and executes tool calls with explicit safety confirmations for writes and shell commands.
 
                                     ⠀⠀⠀⠀⢠⡶⠚⢷⣤⡀⠀⠀⠀⠀⠀⣲⡶⠛⠻⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                                     ⠀⠀⠀⢠⡿⠁⠀⠀⠙⣷⣄⠀⢀⣴⡟⠁⠀⠀⢷⢹⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -40,7 +40,7 @@ TermiLynx is a terminal-first coding agent for real project folders. It connects
 
 ```bash
 git clone <repo-url>
-cd TermiLynx
+cd OpenMerlin-CLI
 npm install
 npm run build
 npm link
@@ -49,12 +49,12 @@ npm link
 Then run from any project directory:
 
 ```bash
-termilynx
+openmerlin
 ```
 
 ## First Run and Configuration
 
-TermiLynx launches an interactive setup that creates provider/model profiles.
+OpenMerlin-CLI launches an interactive setup that creates provider/model profiles.
 
 Built-in providers:
 
@@ -82,7 +82,7 @@ Start in a project folder:
 
 ```bash
 cd path/to/project
-termilynx
+openmerlin
 ```
 
 Run in development mode:

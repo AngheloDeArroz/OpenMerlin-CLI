@@ -13,7 +13,7 @@ function buildSystemPrompt(projectContext: string): string {
     .map((t) => `- **${t.name}**: ${t.description}`)
     .join('\n');
 
-  return `You are termilynx, an expert coding assistant running in the user's terminal.
+  return `You are OpenMerlin-CLI, an expert coding assistant running in the user's terminal.
 
 ## Available Tools
 ${toolDescriptions}

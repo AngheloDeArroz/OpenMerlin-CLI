@@ -1,11 +1,11 @@
 {
-  "name": "termilynx",
+  "name": "openmerlin-cli",
   "version": "1.0.0",
   "description": "Production CLI coding agent — connects to any AI API",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
-    "termilynx": "./dist/index.js"
+    "openmerlin": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
