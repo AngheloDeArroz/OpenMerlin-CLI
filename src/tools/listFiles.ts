@@ -91,7 +91,12 @@ export const listFilesTool: Tool = {
 
     try {
       const tree = listDirRecursive(absolutePath, '', 0, maxDepth);
-      return { success: true, output: tree.join('\n') };
+      let output = tree.join('\n');
+      const MAX_OUTPUT = 5_000;
+      if (output.length > MAX_OUTPUT) {
+        output = output.slice(0, MAX_OUTPUT) + '\n\n...(truncated — tree output exceeded 5000 chars)';
+      }
+      return { success: true, output };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       return { success: false, output: '', error: message };

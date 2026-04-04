@@ -4,7 +4,8 @@ import { isSafePath } from '../safety.js';
 import type { Tool, ToolResult } from './index.js';
 
 const IGNORE_DIRS = new Set(['node_modules', '.git', 'dist', '.next', '__pycache__', '.venv', 'venv', 'coverage']);
-const MAX_RESULTS = 50;
+const MAX_RESULTS = 20;
+const MAX_LINE_LENGTH = 200;
 
 interface SearchMatch {
   file: string;
@@ -21,10 +22,13 @@ function searchInFile(filePath: string, query: string, projectRoot: string): Sea
 
     for (let i = 0; i < lines.length; i++) {
       if (lines[i].includes(query)) {
+        const trimmedContent = lines[i].trim();
         matches.push({
           file: relativePath,
           line: i + 1,
-          content: lines[i].trim(),
+          content: trimmedContent.length > MAX_LINE_LENGTH
+            ? trimmedContent.slice(0, MAX_LINE_LENGTH) + '…'
+            : trimmedContent,
         });
       }
     }

@@ -3,38 +3,23 @@ import { callLLM, LLMError } from './llm.js';
 import type { LLMMessage, ToolCall } from './llm.js';
 import { getToolDefinitions, executeTool } from './tools/index.js';
 import { generatePlan, presentPlan } from './planner.js';
+import { compactToolResults, pruneHistory, estimateHistoryTokens } from './historyManager.js';
 import * as output from './output.js';
 
 const MAX_TOOL_ITERATIONS = 20;
 
 function buildSystemPrompt(projectContext: string): string {
-  const toolDefs = getToolDefinitions();
-  const toolDescriptions = toolDefs
-    .map((t) => `- **${t.name}**: ${t.description}`)
-    .join('\n');
-
   return `You are OpenMerlin-CLI, an expert coding assistant running in the user's terminal.
-
-## Available Tools
-${toolDescriptions}
 
 ## Project Context
 ${projectContext}
 
-## Instructions
-- Think step by step before making changes
-- For complex tasks (multi-file edits, new features, refactors), create a plan first
-- Always read relevant files before editing them
-- When writing files, provide the COMPLETE file content — never use placeholders or ellipsis
-- Use search_code to understand the codebase before making changes
-- Explain what you're doing and why at each step
-- Be concise but thorough in your responses
-
-## Safety Rules
-- Never modify files outside the project directory
-- Always confirm with the user before writing files or running commands
-- Never expose API keys, secrets, or credentials in your responses
-- If unsure about a destructive action, ask the user first`;
+## Rules
+- Read files before editing. Provide COMPLETE file content when writing — no placeholders.
+- Think step-by-step. Be concise.
+- Never modify files outside the project directory.
+- Confirm with the user before writing files or running commands.
+- Never expose API keys or secrets.`;
 }
 
 export async function runAgent(
@@ -91,9 +76,16 @@ export async function runAgent(
   while (iterations < MAX_TOOL_ITERATIONS) {
     iterations++;
 
+    // Token optimization: compact old tool results, then prune if over budget
+    compactToolResults(history, 2);
+    const prunedHistory = pruneHistory(history);
+
+    const inputTokens = estimateHistoryTokens(prunedHistory);
+    output.tokenEstimate(inputTokens);
+
     let response;
     try {
-      response = await callLLM(config, history, toolDefs);
+      response = await callLLM(config, prunedHistory, toolDefs);
     } catch (err) {
       if (err instanceof LLMError) {
         output.error(`LLM API error: ${err.message}`);

@@ -80,6 +80,10 @@ export function goodbye(): void {
   console.log(chalk.dim('  Goodbye.'));
 }
 
+export function tokenEstimate(count: number): void {
+  console.log(chalk.dim(`  ⏱ ~${count.toLocaleString()} input tokens`));
+}
+
 export function hint(msg: string): void {
   console.log(chalk.dim(`  💡 ${msg}`));
 }

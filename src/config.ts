@@ -589,14 +589,7 @@ export async function promptForStartupConfig(): Promise<Config> {
     return await promptForConfig();
   }
 
-  // Only one profile — use it automatically
-  if (configFile.profiles.length === 1) {
-    const profile = configFile.profiles[0];
-    console.log(chalk.dim(`  Using profile: ${profile.name}`));
-    return profile.config;
-  }
-
-  // Multiple profiles — let user pick
+  // Single or multiple profiles — let user pick
   console.log('');
   console.log(chalk.bold.cyan('  Select an AI profile:\n'));
 
@@ -662,11 +655,6 @@ export async function promptForStartupConfig(): Promise<Config> {
 // ─── Remove Profile ─────────────────────────────────────────────────────────
 
 async function removeProfile(configFile: ConfigFile): Promise<void> {
-  if (configFile.profiles.length <= 1) {
-    console.log(chalk.yellow('\n  Cannot remove the only profile.\n'));
-    return;
-  }
-
   console.log('\n  Which profile do you want to remove?\n');
   configFile.profiles.forEach((p, i) => {
     console.log(`    ${i + 1}. ${p.name}`);
@@ -741,7 +729,8 @@ export async function promptForConfigMenu(currentConfig: Config): Promise<Config
   console.log('    1. Switch to a saved profile');
   console.log('    2. Add a new AI profile');
   console.log('    3. Change model only');
-  console.log('    4. Cancel');
+  console.log('    4. Remove a profile');
+  console.log('    5. Cancel');
   console.log('');
 
   const rl = readline.createInterface({
@@ -751,12 +740,12 @@ export async function promptForConfigMenu(currentConfig: Config): Promise<Config
 
   let choice = 0;
   while (choice === 0) {
-    const answer = await askQuestion(rl, '  Choice [1-4]: ');
+    const answer = await askQuestion(rl, '  Choice [1-5]: ');
     const num = parseInt(answer, 10);
-    if (num >= 1 && num <= 4) {
+    if (num >= 1 && num <= 5) {
       choice = num;
     } else {
-      console.log('  Please enter a number between 1 and 4.');
+      console.log('  Please enter a number between 1 and 5.');
     }
   }
 
@@ -776,6 +765,14 @@ export async function promptForConfigMenu(currentConfig: Config): Promise<Config
     case 3:
       return await promptForModelChange(currentConfig);
     case 4:
+      // Remove a profile
+      if (!configFile) return null;
+      await removeProfile(configFile);
+      // Return null to ensure the active config hasn't changed if they deleted something else
+      // or to keep using the current profile logic as is.
+      // Alternatively, we can let user pick again, but returning null exits menu cleanly.
+      return null;
+    case 5:
     default:
       return null;
   }

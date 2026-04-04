@@ -3,6 +3,19 @@ import { blockDangerousCommand, confirmAction } from '../safety.js';
 import type { Tool, ToolResult } from './index.js';
 
 const TIMEOUT_MS = 30_000;
+const MAX_OUTPUT = 8_000;
+const HALF_OUTPUT = MAX_OUTPUT / 2;
+
+function truncateOutput(text: string): string {
+  if (text.length <= MAX_OUTPUT) return text;
+  const head = text.slice(0, HALF_OUTPUT);
+  const tail = text.slice(-HALF_OUTPUT);
+  return `${head}
+
+...(truncated ${text.length - MAX_OUTPUT} chars)...
+
+${tail}`;
+}
 
 export const runCommandTool: Tool = {
   definition: {
@@ -61,8 +74,8 @@ export const runCommandTool: Tool = {
           return;
         }
 
-        const output = [stdout, stderr].filter(Boolean).join('\n').trim();
-        resolve({ success: true, output });
+        const raw = [stdout, stderr].filter(Boolean).join('\n').trim();
+        resolve({ success: true, output: truncateOutput(raw) });
       });
 
       // Stream stdout/stderr to console

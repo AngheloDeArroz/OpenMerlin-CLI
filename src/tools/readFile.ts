@@ -3,10 +3,12 @@ import * as path from 'node:path';
 import { isSafePath } from '../safety.js';
 import type { Tool, ToolResult } from './index.js';
 
+const MAX_FILE_OUTPUT = 10_000; 
+
 export const readFileTool: Tool = {
   definition: {
     name: 'read_file',
-    description: 'Read the contents of a file at the given path. The path should be relative to the project root.',
+    description: 'Read the contents of a file at the given path. The path should be relative to the project root. Output is truncated to ~10K chars for large files.',
     parameters: {
       type: 'object',
       properties: {
@@ -41,6 +43,16 @@ export const readFileTool: Tool = {
 
     try {
       const content = fs.readFileSync(absolutePath, 'utf-8');
+      const lineCount = content.split('\n').length;
+
+      if (content.length > MAX_FILE_OUTPUT) {
+        const truncated = content.slice(0, MAX_FILE_OUTPUT);
+        return {
+          success: true,
+          output: `${truncated}\n\n...(truncated — showing first ${MAX_FILE_OUTPUT} chars of ${content.length} total, ${lineCount} lines)`,
+        };
+      }
+
       return { success: true, output: content };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);

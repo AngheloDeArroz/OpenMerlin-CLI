@@ -74,7 +74,7 @@ export function scanProject(dir: string): ProjectSummary {
     try {
       const content = fs.readFileSync(readmePath, 'utf-8');
       // Truncate to first 2000 chars to keep prompt small
-      readme = content.length > 2000 ? content.slice(0, 2000) + '\n...(truncated)' : content;
+      readme = content.length > 500 ? content.slice(0, 500) + '\n...(truncated)' : content;
     } catch {
       // ignore read errors
     }
