@@ -1,5 +1,5 @@
 {
-  "name": "openmerlin-cli",
+  "name": "openmerlin",
   "version": "1.0.0",
   "description": "Production CLI coding agent — connects to any AI API",
   "type": "module",
@@ -7,6 +7,9 @@
   "bin": {
     "openmerlin": "./dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
