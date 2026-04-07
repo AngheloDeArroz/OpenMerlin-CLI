@@ -1,132 +1,188 @@
 import chalk from 'chalk';
 import { createPatch } from 'diff';
 
+const GOLD   = '#4f9eff';
+const TEAL   = '#7ec8ff';
+const STEEL  = '#7c8fa6';
+const WHITE  = '#e0e0e0';
+const DIM    = '#555555';
+
 export function thinking(): void {
-  console.log(chalk.dim('  Thinking...'));
+  console.log(chalk.hex(DIM)('  ⠦ Thinking...'));
 }
 
 export function phaseLabel(phase: string): void {
-  console.log(chalk.bold.magenta(`  ⚡ ${phase}`));
+  console.log('');
+  console.log(chalk.bold.hex(GOLD)(`  ⚡ ${phase}`));
 }
 
 export function diffSummary(files: string[]): void {
-  console.log(chalk.cyan(`  📋 ${files.length} file(s) to change:`));
+  console.log(chalk.hex(STEEL)(`  ${files.length} file(s) queued for edit:`));
   for (const f of files) {
-    console.log(chalk.white(`      ${f}`));
+    console.log(chalk.hex(WHITE)(`    · ${f}`));
   }
 }
 
 export function toolStart(name: string): void {
-  console.log(chalk.cyan(`  Running tool: ${name}`));
+  console.log(chalk.hex(STEEL)(`  ▶ ${name}`));
 }
 
 export function toolDone(name: string): void {
-  console.log(chalk.green(`  ✔ Tool complete: ${name}`));
+  console.log(chalk.hex(TEAL)(`  ✔ ${name}`));
 }
 
 export function editingFile(filePath: string): void {
-  console.log(chalk.yellow(`  Editing file: ${filePath}`));
+  console.log(chalk.hex(GOLD)(`  ~ ${filePath}`));
 }
 
 export function showDiff(filePath: string, before: string, after: string): void {
   const patch = createPatch(filePath, before, after, 'original', 'modified');
   const lines = patch.split('\n');
-
   for (const line of lines) {
     if (line.startsWith('+') && !line.startsWith('+++')) {
       console.log(chalk.green(`  ${line}`));
     } else if (line.startsWith('-') && !line.startsWith('---')) {
       console.log(chalk.red(`  ${line}`));
     } else if (line.startsWith('@@')) {
-      console.log(chalk.magenta(`  ${line}`));
+      console.log(chalk.hex(STEEL)(`  ${line}`));
     } else {
-      console.log(chalk.dim(`  ${line}`));
+      console.log(chalk.hex(DIM)(`  ${line}`));
     }
   }
 }
 
 export function vscodeDiffOpened(filePath: string): void {
-  console.log(chalk.cyan(`  📂 Diff opened in VS Code → ${filePath}`));
+  console.log(chalk.hex(TEAL)(`  ↗ Opened in VS Code: ${filePath}`));
 }
-
 
 export function agentReply(text: string): void {
   console.log('');
-  console.log(chalk.white(text));
+  console.log(chalk.hex(WHITE)(text));
   console.log('');
 }
 
 export function error(msg: string): void {
-  console.log(chalk.red(`  ✖ Error: ${msg}`));
+  console.log(chalk.red(`  ✖ ${msg}`));
 }
 
 export function info(msg: string): void {
-  console.log(chalk.blue(`  ℹ ${msg}`));
+  console.log(chalk.hex(STEEL)(`  · ${msg}`));
 }
 
 export function warn(msg: string): void {
-  console.log(chalk.yellow(`  ⚠ ${msg}`));
+  console.log(chalk.hex(GOLD)(`  ⚠ ${msg}`));
 }
 
 export function planning(): void {
-  console.log(chalk.magenta('  Planning...'));
+  console.log(chalk.hex(GOLD)('  ⠦ Planning...'));
 }
 
 export function planStep(index: number, step: string): void {
-  console.log(chalk.white(`    ${index + 1}. ${step}`));
+  console.log(chalk.hex(DIM)(`    ${index + 1}.`) + ' ' + chalk.hex(WHITE)(step));
 }
 
 export function banner(cwd: string, modelInfo?: { provider: string; model: string }): void {
+  const ascii = [
+    '   ██████╗ ██████╗ ███████╗███╗   ██╗',
+    '  ██╔═══██╗██╔══██╗██╔════╝████╗  ██║',
+    '  ██║   ██║██████╔╝█████╗  ██╔██╗ ██║',
+    '  ██║   ██║██╔═══╝ ██╔══╝  ██║╚██╗██║',
+    '  ╚██████╔╝██║     ███████╗██║ ╚████║',
+    '   ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝',
+    '  ███╗   ███╗███████╗██████╗ ██╗     ██╗███╗   ██╗',
+    '  ████╗ ████║██╔════╝██╔══██╗██║     ██║████╗  ██║',
+    '  ██╔████╔██║█████╗  ██████╔╝██║     ██║██╔██╗ ██║',
+    '  ██║╚██╔╝██║██╔══╝  ██╔══██╗██║     ██║██║╚██╗██║',
+    '  ██║ ╚═╝ ██║███████╗██║  ██║███████╗██║██║ ╚████║',
+    '  ╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝  ╚═══╝',
+  ];
+
   console.log('');
-  console.log(chalk.bold.cyan('  ╔═══════════════════════════════╗'));
-  console.log(chalk.bold.cyan('  ║       OpenMerlin CLI          ║'));
-  console.log(chalk.bold.cyan('  ╚═══════════════════════════════╝'));
-  console.log(chalk.dim(`  Project: ${cwd}`));
-  if (modelInfo) {
-    console.log(chalk.green(`  AI:      ${modelInfo.provider} / ${modelInfo.model}`));
+  for (const line of ascii) {
+    console.log(chalk.bold.hex(GOLD)(line));
   }
+  console.log('');
+
+  const sep = chalk.hex(DIM)('  ' + '─'.repeat(50));
+  console.log(sep);
+
+  console.log(
+    chalk.hex(STEEL)('  cwd    ') + chalk.hex(WHITE)(cwd),
+  );
+  if (modelInfo) {
+    console.log(
+      chalk.hex(STEEL)('  model  ') +
+        chalk.hex(WHITE)(modelInfo.model) +
+        chalk.hex(DIM)('  via ') +
+        chalk.hex(STEEL)(modelInfo.provider),
+    );
+  }
+  console.log(
+    chalk.hex(STEEL)('  status ') + chalk.hex(TEAL)('● ready'),
+  );
+
+  console.log(sep);
   console.log('');
 }
 
 export function showActiveModel(provider: string, model: string): void {
-  console.log(chalk.green(`  🤖 Active AI: ${provider} / ${model}`));
+  console.log(
+    chalk.hex(TEAL)('  ● ') +
+      chalk.hex(WHITE)(model) +
+      chalk.hex(DIM)('  via ') +
+      chalk.hex(STEEL)(provider),
+  );
 }
 
 export function goodbye(): void {
-  console.log(chalk.dim('  Goodbye.'));
+  console.log('');
+  console.log(chalk.hex(DIM)('  Goodbye.'));
+  console.log('');
 }
 
 export function tokenEstimate(count: number): void {
-  console.log(chalk.dim(`  ⏱ ~${count.toLocaleString()} input tokens`));
+  console.log(chalk.hex(DIM)(`  ~${count.toLocaleString()} tokens`));
 }
 
 export function hint(msg: string): void {
-  console.log(chalk.dim(`  💡 ${msg}`));
+  console.log(chalk.hex(DIM)(`  💡 ${msg}`));
 }
 
 export function showHelp(): void {
   console.log('');
-  console.log(chalk.bold.cyan('  Commands:'));
+  console.log(chalk.bold.hex(WHITE)('  Commands'));
   console.log('');
-  console.log(chalk.white('    --model   ') + chalk.dim(' Change AI provider or model'));
-  console.log(chalk.white('    --config  ') + chalk.dim(' Open full configuration menu'));
-  console.log(chalk.white('    --clear   ') + chalk.dim(' Clear conversation history'));
-  console.log(chalk.white('    --multi   ') + chalk.dim(' Prefix: --multi <task> (parallel worker agents)'));
-  console.log(chalk.white('    --help    ') + chalk.dim(' Show this help'));
-  console.log(chalk.white('    --exit    ') + chalk.dim(' Exit OpenMerlin-CLI'));
+
+  const cmds: [string, string][] = [
+    ['--model  ', 'Change AI provider or model'],
+    ['--config ', 'Open configuration menu'],
+    ['--clear  ', 'Clear conversation history'],
+    ['--multi  ', 'Run task with parallel worker agents'],
+    ['--help   ', 'Show this help'],
+    ['--exit   ', 'Exit OpenMerlin'],
+  ];
+
+  for (const [cmd, desc] of cmds) {
+    console.log(
+      '  ' + chalk.hex(GOLD)(cmd) + '  ' + chalk.hex(DIM)(desc),
+    );
+  }
+
   console.log('');
-  console.log(chalk.dim('  Anything else is sent as a prompt to the AI.'));
+  console.log(chalk.hex(DIM)('  Anything else is sent as a prompt.'));
   console.log('');
 }
 
-// ─── Multi-Agent Orchestration Output ─────────────────────────────────────
+// ─── Multi-Agent Orchestration ────────────────────────────────────────────
 
 export function orchestratorStatus(msg: string): void {
-  console.log(chalk.bold.magenta(`  🔀 ${msg}`));
+  console.log(chalk.bold.hex(GOLD)(`  ⟳ ${msg}`));
 }
 
 export function workerStatus(id: string, msg: string): void {
-  console.log(chalk.cyan(`    [Worker ${id}] ${msg}`));
+  console.log(
+    chalk.hex(STEEL)(`    [${id}] `) + chalk.hex(WHITE)(msg),
+  );
 }
 
 export function showGroupedDiffs(grouped: Map<string, { patch: string }[]>): void {
@@ -136,26 +192,20 @@ export function showGroupedDiffs(grouped: Map<string, { patch: string }[]>): voi
     const { added, removed } = countDiffLines(patch);
 
     const isNew = removed === 0 && added > 0;
-    const label = isNew
-      ? chalk.green('NEW')
-      : chalk.yellow('MOD');
+    const label = isNew ? chalk.hex(TEAL)('new') : chalk.hex(GOLD)('mod');
 
     const stats = isNew
       ? chalk.green(`+${added}`)
       : `${chalk.green(`+${added}`)} ${chalk.red(`-${removed}`)}`;
 
-    const conflict = diffs.length > 1
-      ? chalk.yellow(` ⚠ ${diffs.length} workers`)
-      : '';
+    const conflict =
+      diffs.length > 1 ? chalk.hex(GOLD)(` ⚠ ${diffs.length} workers`) : '';
 
-    console.log(`    ${label}  ${chalk.white(filePath)}  ${stats}${conflict}`);
+    console.log(`  ${label}  ${chalk.hex(WHITE)(filePath)}  ${stats}${conflict}`);
   }
   console.log('');
 }
 
-/**
- * Show full diff with syntax coloring — used in per-file "edit" approval mode.
- */
 export function showSingleDiff(patch: string): void {
   const lines = patch.split('\n');
   for (const line of lines) {
@@ -164,9 +214,9 @@ export function showSingleDiff(patch: string): void {
     } else if (line.startsWith('-') && !line.startsWith('---')) {
       console.log(chalk.red(`    ${line}`));
     } else if (line.startsWith('@@')) {
-      console.log(chalk.magenta(`    ${line}`));
+      console.log(chalk.hex(STEEL)(`    ${line}`));
     } else {
-      console.log(chalk.dim(`    ${line}`));
+      console.log(chalk.hex(DIM)(`    ${line}`));
     }
   }
 }
@@ -187,21 +237,22 @@ export function tokenReport(
   if (usages.length === 0) return;
 
   console.log('');
-  orchestratorStatus('Token Usage:');
+  console.log(chalk.bold.hex(WHITE)('  Token usage'));
+  console.log('');
   console.log(
-    chalk.dim('    ┌──────────────────┬──────────────┬──────────────┐'),
+    chalk.hex(DIM)('    ┌──────────────────┬──────────────┬──────────────┐'),
   );
   console.log(
-    chalk.dim('    │') +
-      chalk.bold(' Agent            ') +
-      chalk.dim('│') +
-      chalk.bold(' Input        ') +
-      chalk.dim('│') +
-      chalk.bold(' Output       ') +
-      chalk.dim('│'),
+    chalk.hex(DIM)('    │') +
+      chalk.hex(STEEL)(' Agent             ') +
+      chalk.hex(DIM)('│') +
+      chalk.hex(STEEL)(' Input         ') +
+      chalk.hex(DIM)('│') +
+      chalk.hex(STEEL)(' Output        ') +
+      chalk.hex(DIM)('│'),
   );
   console.log(
-    chalk.dim('    ├──────────────────┼──────────────┼──────────────┤'),
+    chalk.hex(DIM)('    ├──────────────────┼──────────────┼──────────────┤'),
   );
 
   let totalIn = 0;
@@ -210,40 +261,40 @@ export function tokenReport(
     totalIn += u.inputTokens;
     totalOut += u.outputTokens;
     const agent = u.agentId.padEnd(16);
-    const inp = u.inputTokens.toLocaleString().padStart(12);
-    const outp = u.outputTokens.toLocaleString().padStart(12);
+    const inp   = u.inputTokens.toLocaleString().padStart(12);
+    const outp  = u.outputTokens.toLocaleString().padStart(12);
     console.log(
-      chalk.dim('    │') +
-        ` ${agent} ` +
-        chalk.dim('│') +
-        ` ${inp} ` +
-        chalk.dim('│') +
-        ` ${outp} ` +
-        chalk.dim('│'),
+      chalk.hex(DIM)('    │') +
+        chalk.hex(WHITE)(` ${agent} `) +
+        chalk.hex(DIM)('│') +
+        chalk.hex(WHITE)(` ${inp} `) +
+        chalk.hex(DIM)('│') +
+        chalk.hex(WHITE)(` ${outp} `) +
+        chalk.hex(DIM)('│'),
     );
   }
 
   console.log(
-    chalk.dim('    ├──────────────────┼──────────────┼──────────────┤'),
+    chalk.hex(DIM)('    ├──────────────────┼──────────────┼──────────────┤'),
   );
-  const totalAgent = 'TOTAL'.padEnd(16);
-  const totalInStr = totalIn.toLocaleString().padStart(12);
+  const totalAgent  = 'TOTAL'.padEnd(16);
+  const totalInStr  = totalIn.toLocaleString().padStart(12);
   const totalOutStr = totalOut.toLocaleString().padStart(12);
   console.log(
-    chalk.dim('    │') +
-      chalk.bold(` ${totalAgent} `) +
-      chalk.dim('│') +
-      chalk.bold(` ${totalInStr} `) +
-      chalk.dim('│') +
-      chalk.bold(` ${totalOutStr} `) +
-      chalk.dim('│'),
+    chalk.hex(DIM)('    │') +
+      chalk.bold.hex(GOLD)(` ${totalAgent} `) +
+      chalk.hex(DIM)('│') +
+      chalk.bold.hex(GOLD)(` ${totalInStr} `) +
+      chalk.hex(DIM)('│') +
+      chalk.bold.hex(GOLD)(` ${totalOutStr} `) +
+      chalk.hex(DIM)('│'),
   );
   console.log(
-    chalk.dim('    └──────────────────┴──────────────┴──────────────┘'),
+    chalk.hex(DIM)('    └──────────────────┴──────────────┴──────────────┘'),
   );
+  console.log('');
 }
 
-
 export function formatWrittenFile(filePath: string): string {
-  return chalk.green(`    ✔ ${filePath}`);
+  return chalk.hex(TEAL)(`  ✔ `) + chalk.hex(WHITE)(filePath);
 }
