@@ -1,110 +1,122 @@
-# OpenMerlin-CLI
+# ![OpenMerlin Banner](docs/assets/banner.png)
 
-OpenMerlin-CLI is a terminal-first coding agent for real project folders. It connects to an LLM provider, scans your codebase for context, and executes tool calls with explicit safety confirmations for writes and shell commands.
-                                
-## What It Does
+<div align="center">
 
-- Runs as a local CLI coding assistant
-- Uses OpenAI-compatible chat completions (`/chat/completions`)
-- Supports multi-profile provider setup and switching
-- Scans project structure, `package.json`, and `README.md` for context
-- Calls tools for reading, searching, writing files, and running commands
-- Generates an approval plan for complex tasks
+[![npm version](https://img.shields.io/npm/v/openmerlin?color=4f9eff&style=flat-square)](https://www.npmjs.com/package/openmerlin)
+[![License: MIT](https://img.shields.io/badge/license-MIT-4f9eff?style=flat-square)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-4f9eff?style=flat-square)](CONTRIBUTING.md)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-4f9eff?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-4f9eff?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 
-## Requirements
+### **Production CLI coding agent — connects to any AI.**
 
-- Node.js >= 18
-- npm
+*Lightweight. Fast. Built for engineers who live in the terminal.*
 
-## Installation
+</div>
+
+---
+
+## Why OpenMerlin?
+
+Most AI coding tools are bloated GUI apps that lock you into one provider, burn through tokens, and yank you out of your flow. OpenMerlin stays in your terminal, connects to **any LLM**, and keeps API costs low with smart token management built in from day one. When it's time to review a change, it opens a clean side-by-side diff right in VS Code — no noise, no context switching, no surprises.
+
+---
+
+## Demo
+
+![Demo](docs/assets/demo.gif)
+
+> *OpenMerlin planning a refactor, writing diffs, and opening a VS Code review — all from the terminal.*
+
+---
+
+## ✨ Features
+
+- 🧠 **Two-Phase Agentic Loop** — Clean separation between the Plan Phase (AI reasoning + diff generation) and the Apply Phase (code execution with your explicit confirmation).
+- 🔀 **Multi-Agent Mode** — Spin up parallel worker agents for large tasks with `--multi`.
+- 🔌 **Universal AI Compatibility** — OpenAI, Anthropic, Google Gemini, Groq, OpenRouter, and Ollama (local). Switch providers at runtime.
+- 🖥️ **VS Code Diff Integration** — Every file change opens as a side-by-side diff in your IDE. Review it like a pull request before anything touches disk.
+- 🛡️ **Safety-First Tool System** — File writes and shell commands always require explicit confirmation. Dangerous patterns are blocked before execution.
+- 💸 **Advanced Token Management** — Sliding-window pruning, conversation compaction, and tool output truncation keep long sessions fast and cheap.
+- ⚡ **Lightweight by Design** — Pure TypeScript on Node.js. No heavy runtimes, no Electron, no bloat.
+
+---
+
+## 🚀 Quickstart
+
+**Install globally:**
 
 ```bash
-git clone <repo-url>
-cd OpenMerlin-CLI
-npm install
-npm run build
-npm link
+npm install -g openmerlin
 ```
 
-Then run from any project directory:
+**Or run instantly with npx:**
 
 ```bash
+npx openmerlin
+```
+
+**Start a session in your project:**
+
+```bash
+cd path/to/your/project
 openmerlin
 ```
 
-## First Run and Configuration
+---
 
-OpenMerlin-CLI launches an interactive setup that creates provider/model profiles.
+## 🛠️ Configuration
 
-Built-in providers:
+On first run, OpenMerlin launches an interactive setup to create your provider/model profiles.
 
-- OpenAI
-- Anthropic
-- Google Gemini
-- Groq
-- OpenRouter
-- Ollama (local)
+**Supported providers out of the box:**
 
-Config location:
+| Provider | Type |
+|---|---|
+| OpenAI | Cloud |
+| Anthropic | Cloud |
+| Google Gemini | Cloud |
+| Groq | Cloud |
+| OpenRouter | Cloud |
+| Ollama | Local |
 
-- macOS/Linux: `~/.myagent/config.json`
-- Windows: `%USERPROFILE%\\.myagent\\config.json`
+Config is saved automatically to:
 
-Notes:
+- **macOS / Linux:** `~/.myagent/config.json`
+- **Windows:** `%USERPROFILE%\.myagent\config.json`
 
-- Multiple profiles are supported with an active profile index.
-- Existing legacy single-profile config is migrated automatically at load time.
-- Key input is masked in supported terminals.
+Multiple profiles are supported. Switch between them at runtime with `--model`. Existing single-profile configs are migrated automatically on load.
 
-## Usage
+---
 
-Start in a project folder:
+## 🧠 How It Works
 
-```bash
-cd path/to/project
-openmerlin
-```
+### Two-Phase Agentic Loop
 
-Run in development mode:
+OpenMerlin separates *thinking* from *doing* — a distinction most agents skip.
 
-```bash
-npm run dev
-```
+**Plan Phase** — The AI scans your project structure, `package.json`, and `README.md` for context, reasons about the task, and generates a structured set of diffs. Nothing is written to disk yet.
 
-Common prompts you can type:
+**Apply Phase** — You review the proposed changes (side-by-side in VS Code or inline in the terminal), confirm, and OpenMerlin executes. Every write and shell command requires your explicit approval.
 
-- "find all TODOs in src"
-- "add error handling to functions in src/api.ts"
-- "explain how auth works in this repo"
-- "run tests and summarize failures"
+### Token Management
 
-## Built-in CLI Commands
+Long coding sessions are expensive. OpenMerlin handles this automatically with:
 
-- `help`: Show command help
-- `config`: Open runtime config menu
-- `model` or `switch`: Switch provider/model profile
-- `clear`: Clear conversation history
-- `exit` or `quit`: Exit the app
+- **Sliding-window pruning** — older low-value messages are dropped from context
+- **Conversation compaction** — summaries replace verbose history without losing meaning
+- **Tool output truncation** — large file reads and command outputs are trimmed before hitting the context window
 
-## Tool System
+### Safety Model
 
-Registered tools:
+- All file access is restricted to paths inside your active project root
+- `write_file` always shows a diff and asks for confirmation before writing
+- `run_command` always asks for confirmation and blocks dangerous patterns
+- Shell execution has a 30-second timeout and a 1 MB output buffer
 
-- `read_file`: Read a file relative to project root
-- `write_file`: Show diff and ask confirmation before write
-- `list_files`: Show directory tree (depth-limited)
-- `search_code`: Search text across project files
-- `run_command`: Execute shell command after safety check + confirmation
+---
 
-## Safety Model
-
-- File access is restricted to paths inside the active project root.
-- `write_file` always asks for explicit confirmation.
-- `run_command` always asks for explicit confirmation.
-- Dangerous command patterns are blocked before execution.
-- Shell execution has a 30-second timeout and 1 MB output buffer.
-
-## Architecture Overview
+## 📁 Architecture
 
 ```text
 src/
@@ -112,7 +124,7 @@ src/
   config.ts        # Profile setup, save/load, switching
   scanner.ts       # Project structure + metadata summarization
   agent.ts         # Main LLM loop and tool-call execution
-  llm.ts           # OpenAI-compatible HTTP API client
+  llm.ts           # OpenAI-compatible HTTP client
   planner.ts       # Plan generation and user approval
   safety.ts        # Path safety and dangerous command rules
   output.ts        # Terminal UI and formatting
@@ -125,64 +137,65 @@ src/
     writeFile.ts
 ```
 
-## Development
+---
 
-```bash
-npm run dev
-npm run build
-npm start
+## 💬 Commands
+
+| Command | Description |
+|---|---|
+| `--model` / `switch` | Switch provider or model profile |
+| `--config` | Open runtime configuration menu |
+| `--clear` | Clear conversation history |
+| `--multi <task>` | Run task with parallel worker agents |
+| `--help` | Show all commands |
+| `--exit` / `quit` | Exit OpenMerlin |
+
+**Example prompts to get started:**
+
+```
+find all TODOs in src
+add error handling to functions in src/api.ts
+explain how auth works in this repo
+run tests and summarize failures
 ```
 
-`npm run build` compiles TypeScript into `dist/` and `npm start` runs the compiled CLI.
+---
 
-## Open Source Contribution Plan
+## 🤝 Contributing
 
-This is the execution plan for making contributions easy and consistent.
+OpenMerlin is open source and PRs are very welcome.
 
-### Phase 1: Repository Foundations
+```bash
+git clone https://github.com/your-username/openmerlin-cli
+cd openmerlin-cli
+npm install
+npm run dev
+```
 
-- Add `LICENSE` file (MIT)
-- Add `CONTRIBUTING.md`
-- Add PR template and issue templates
-- Add a simple `CODE_OF_CONDUCT.md`
+Validate your changes with `npm run build`, then test manually with `npm run dev` in a sample project. Open a PR describing your changes, reasoning, and how you tested it.
 
-### Phase 2: Quality and Reliability
-
-- Add unit tests for `safety.ts`
-- Add tests for tool parameter validation and error handling
-- Add integration tests for approval flows (`write_file`, `run_command`)
-- Add CI workflow for build/test on Windows + Linux + macOS
-
-### Phase 3: Product Improvements
-
-- Improve malformed tool-call recovery in LLM responses
-- Add stronger provider diagnostics (401/403/timeout guidance)
-- Add optional streaming output mode
-- Add conversation/session export
-
-### Phase 4: Contributor Experience
-
-- Tag and maintain `good first issue` tasks
-- Keep docs updated with each behavior change
-- Require focused PR scope (single concern per PR)
-
-## How to Contribute
-
-1. Fork and clone.
-2. Create a feature branch.
-3. Install dependencies with `npm install`.
-4. Validate with `npm run build`.
-5. Test manually using `npm run dev` in a sample project.
-6. Open a PR describing changes, reasoning, and validation steps.
-
-## Good First Issues
+**Good first issues:**
 
 - Add `LICENSE` file in root
 - Add `CONTRIBUTING.md`
 - Add tests for dangerous command pattern coverage
-- Improve command help output examples
+- Improve command help output with better examples
 - Add docs for profile migration behavior
 
-## License
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
-MIT (declared in `package.json`).
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+
+Built with TypeScript · Made for developers who ship
+
+**[npm](https://www.npmjs.com/package/openmerlin) · [Issues](https://github.com/your-username/openmerlin-cli/issues) · [Discussions](https://github.com/your-username/openmerlin-cli/discussions)**
+
+</div>
