@@ -154,12 +154,12 @@ export function showHelp(): void {
   console.log('');
 
   const cmds: [string, string][] = [
-    ['--model  ', 'Change AI provider or model'],
-    ['--config ', 'Open configuration menu'],
-    ['--clear  ', 'Clear conversation history'],
-    ['--multi  ', 'Run task with parallel worker agents'],
-    ['--help   ', 'Show this help'],
-    ['--exit   ', 'Exit OpenMerlin'],
+    ['/model  ', 'Change AI provider or model'],
+    ['/config ', 'Open configuration menu'],
+    ['/clear  ', 'Clear conversation history'],
+    ['/multi  ', 'Run task with parallel worker agents'],
+    ['/help   ', 'Show this help'],
+    ['/exit   ', 'Exit OpenMerlin'],
   ];
 
   for (const [cmd, desc] of cmds) {

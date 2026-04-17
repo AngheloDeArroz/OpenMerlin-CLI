@@ -31,7 +31,7 @@ async function main(): Promise<void> {
   const projectSummary = scanProject(cwd);
   const projectContext = formatProjectContext(projectSummary);
   output.info('Project scanned. Ready.');
-  output.hint('Type "--help" to see available commands.\n');
+  output.hint('Type "/help" to see available commands.\n');
 
   // Message history persists across the session
   const history: LLMMessage[] = [];
@@ -68,18 +68,18 @@ async function main(): Promise<void> {
       continue;
     }
 
-    if (trimmed === '--exit' || trimmed === '--quit') {
+    if (trimmed === '/exit' || trimmed === '/quit') {
       output.goodbye();
       process.exit(0);
     }
 
-    if (trimmed === '--clear') {
+    if (trimmed === '/clear') {
       history.length = 0;
       output.info('Conversation history cleared.');
       continue;
     }
 
-    if (trimmed === '--config' || trimmed === '--model' || trimmed === '--switch') {
+    if (trimmed === '/config' || trimmed === '/model' || trimmed === '/switch') {
       const updated = await promptForConfigMenu(config);
       if (updated !== null) {
         config = updated;
@@ -88,8 +88,8 @@ async function main(): Promise<void> {
       continue;
     }
 
-    if (trimmed.startsWith('--multi ')) {
-      const task = trimmed.slice('--multi '.length).trim();
+    if (trimmed.startsWith('/multi ')) {
+      const task = trimmed.slice('/multi '.length).trim();
       if (task) {
         try {
           const { runTask } = await import('./orchestrator.js');
@@ -98,19 +98,19 @@ async function main(): Promise<void> {
           output.error(err instanceof Error ? err.message : String(err));
         }
       } else {
-        output.error('Usage: --multi <task description>');
+        output.error('Usage: /multi <task description>');
       }
       continue;
     }
 
-    if (trimmed === '--help') {
+    if (trimmed === '/help') {
       output.showHelp();
       continue;
     }
 
-    // Catch-all: any --command that wasn't matched above is invalid
-    if (trimmed.startsWith('--')) {
-      output.error(`Unknown command: ${trimmed}. Type --help for available commands.`);
+    // Catch-all: any /command that wasn't matched above is invalid
+    if (trimmed.startsWith('/')) {
+      output.error(`Unknown command: ${trimmed}. Type /help for available commands.`);
       continue;
     }
 

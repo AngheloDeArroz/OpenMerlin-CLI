@@ -33,7 +33,7 @@ Most AI coding tools are bloated GUI apps that lock you into one provider, burn 
 ## ✨ Features
 
 - 🧠 **Two-Phase Agentic Loop** — Clean separation between the Plan Phase (AI reasoning + diff generation) and the Apply Phase (code execution with your explicit confirmation).
-- 🔀 **Multi-Agent Mode** — Spin up parallel worker agents for large tasks with `--multi`.
+- 🔀 **Multi-Agent Mode** — Spin up parallel worker agents for large tasks with `/multi`.
 - 🔌 **Universal AI Compatibility** — OpenAI, Anthropic, Google Gemini, Groq, OpenRouter, and Ollama (local). Switch providers at runtime.
 - 🖥️ **VS Code Diff Integration** — Every file change opens as a side-by-side diff in your IDE. Review it like a pull request before anything touches disk.
 - 🛡️ **Safety-First Tool System** — File writes and shell commands always require explicit confirmation. Dangerous patterns are blocked before execution.
@@ -85,7 +85,7 @@ Config is saved automatically to:
 - **macOS / Linux:** `~/.myagent/config.json`
 - **Windows:** `%USERPROFILE%\.myagent\config.json`
 
-Multiple profiles are supported. Switch between them at runtime with `--model`. Existing single-profile configs are migrated automatically on load.
+Multiple profiles are supported. Switch between them at runtime with `/model`. Existing single-profile configs are migrated automatically on load.
 
 ---
 
@@ -143,12 +143,12 @@ src/
 
 | Command | Description |
 |---|---|
-| `--model` / `switch` | Switch provider or model profile |
-| `--config` | Open runtime configuration menu |
-| `--clear` | Clear conversation history |
-| `--multi <task>` | Run task with parallel worker agents |
-| `--help` | Show all commands |
-| `--exit` / `quit` | Exit OpenMerlin |
+| `/model` / `/switch` | Switch provider or model profile |
+| `/config` | Open runtime configuration menu |
+| `/clear` | Clear conversation history |
+| `/multi <task>` | Run task with parallel worker agents |
+| `/help` | Show all commands |
+| `/exit` / `/quit` | Exit OpenMerlin |
 
 **Example prompts to get started:**
 
