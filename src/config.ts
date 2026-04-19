@@ -122,6 +122,28 @@ async function fetchModels(baseURL: string, apiKey: string): Promise<string[]> {
 
     return data.data
       .map((m: ModelEntry) => m.id)
+      .filter((id: string) => {
+        const lowerId = id.toLowerCase();
+        const nonChatTerms = [
+          'dall-e',
+          'dalle',
+          'imagen',
+          'tts',
+          'whisper',
+          'embedding',
+          'moderation',
+          'audio',
+          'babbage',
+          'davinci',
+          'curie',
+          'ada',
+          'text-search',
+          'text-similarity',
+          'code-search',
+          'aqa'
+        ];
+        return !nonChatTerms.some((term) => lowerId.includes(term));
+      })
       .sort();
   } catch {
     return [];
