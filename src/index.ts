@@ -5,7 +5,7 @@ import { loadConfig, promptForConfig, promptForConfigMenu, getProviderLabel } fr
 import type { Config } from './config.js';
 import { scanProject, formatProjectContext } from './scanner.js';
 import { runAgent } from './agent.js';
-import type { LLMMessage } from './llm.js';
+import { createSessionMemory } from './historyManager.js';
 import * as output from './output.js';
 
 async function main(): Promise<void> {
@@ -33,8 +33,8 @@ async function main(): Promise<void> {
   output.info('Project scanned. Ready.');
   output.hint('Type "/help" to see available commands.\n');
 
-  // Message history persists across the session
-  const history: LLMMessage[] = [];
+  // Session memory — compact summary of prior turns (replaces raw history)
+  let memory = createSessionMemory();
 
   // Helper to create a fresh readline interface each prompt cycle.
   // This avoids conflicts with raw-mode stdin usage in confirmAction.
@@ -74,8 +74,8 @@ async function main(): Promise<void> {
     }
 
     if (trimmed === '/clear') {
-      history.length = 0;
-      output.info('Conversation history cleared.');
+      memory = createSessionMemory();
+      output.info('Session memory cleared.');
       continue;
     }
 
@@ -115,7 +115,8 @@ async function main(): Promise<void> {
     }
 
     try {
-      await runAgent(trimmed, history, config, projectContext, cwd);
+      const result = await runAgent(trimmed, memory, config, projectContext, cwd);
+      memory = result.memory;
     } catch (err) {
       output.error(err instanceof Error ? err.message : String(err));
     }
