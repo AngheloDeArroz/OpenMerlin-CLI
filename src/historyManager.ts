@@ -1,6 +1,76 @@
 import type { LLMMessage } from './llm.js';
 
+// ─── Session Memory (Ephemeral Context Pipeline) ────────────────────────────
+
+/**
+ * Compact cross-turn state. Instead of keeping the full message history,
+ * we carry a small structured summary (~100 tokens) that tells the AI
+ * what has already happened this session.
+ */
+export interface SessionMemory {
+  turnCount: number;
+  filesModified: string[];
+  lastIntent: string;
+  compactSummary: string;
+}
+
+/**
+ * Create an empty session memory for a fresh session.
+ */
+export function createSessionMemory(): SessionMemory {
+  return {
+    turnCount: 0,
+    filesModified: [],
+    lastIntent: '',
+    compactSummary: '',
+  };
+}
+
+/**
+ * Update session memory after a successful turn.
+ * Keeps the summary concise by prepending the latest action.
+ */
+export function updateSessionMemory(
+  memory: SessionMemory,
+  intent: string,
+  filesWritten: string[],
+  wasConversational: boolean,
+): SessionMemory {
+  const newModified = [...new Set([...memory.filesModified, ...filesWritten])];
+
+  // Build a running summary — latest action is appended
+  let summaryLine: string;
+  if (wasConversational) {
+    summaryLine = `Turn ${memory.turnCount + 1}: Answered question about "${intent}"`;
+  } else {
+    const filesList = filesWritten.length > 0 ? ` (${filesWritten.join(', ')})` : '';
+    summaryLine = `Turn ${memory.turnCount + 1}: ${intent}${filesList}`;
+  }
+
+  const prevSummary = memory.compactSummary
+    ? memory.compactSummary + '\n'
+    : '';
+
+  // Cap the summary to ~500 chars (~125 tokens) — keep the most recent turns
+  let newSummary = prevSummary + summaryLine;
+  if (newSummary.length > 500) {
+    const lines = newSummary.split('\n');
+    while (newSummary.length > 500 && lines.length > 1) {
+      lines.shift();
+      newSummary = lines.join('\n');
+    }
+  }
+
+  return {
+    turnCount: memory.turnCount + 1,
+    filesModified: newModified,
+    lastIntent: intent,
+    compactSummary: newSummary,
+  };
+}
+
 // ─── Token Budget ───────────────────────────────────────────────────────────
+
 
 const DEFAULT_MAX_TOKENS = 12_000;
 const CHARS_PER_TOKEN = 4; // rough estimate for English + code
