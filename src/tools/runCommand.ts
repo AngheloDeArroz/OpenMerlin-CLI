@@ -1,5 +1,10 @@
 import { exec } from 'node:child_process';
-import { blockDangerousCommand, confirmAction } from '../safety.js';
+import {
+  classifyCommand,
+  confirmAction,
+  sanitizeEnvironment,
+  detectOutOfProjectPaths,
+} from '../safety.js';
 import type { Tool, ToolResult } from './index.js';
 
 const TIMEOUT_MS = 30_000;
@@ -20,7 +25,8 @@ ${tail}`;
 export const runCommandTool: Tool = {
   definition: {
     name: 'run_command',
-    description: 'Execute a shell command in the project directory. The command is checked against a blocklist of dangerous patterns and requires user confirmation before execution. Has a 30-second timeout.',
+    description:
+      'Execute a shell command in the project directory. Commands are classified by risk: safe commands (ls, git status, etc.) run automatically, normal commands require user confirmation, and dangerous commands are always blocked. The environment is sanitized to prevent leaking secrets. Has a 30-second timeout.',
     parameters: {
       type: 'object',
       properties: {
@@ -36,19 +42,45 @@ export const runCommandTool: Tool = {
   async execute(params: Record<string, unknown>, projectRoot: string): Promise<ToolResult> {
     const command = params.command as string;
 
-    // Check for dangerous commands
-    try {
-      blockDangerousCommand(command);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      return { success: false, output: '', error: message };
+    // ── Step 1: Classify command risk ──────────────────────────────────────
+    const risk = classifyCommand(command);
+
+    if (risk === 'blocked') {
+      return {
+        success: false,
+        output: '',
+        error: `Blocked dangerous command: ${command}`,
+      };
     }
 
-    // Ask user for confirmation
-    const confirmed = await confirmAction(`Run command: ${command}`);
-    if (!confirmed) {
-      return { success: false, output: '', error: 'User cancelled command execution' };
+    // ── Step 2: Warn about out-of-project path references ─────────────────
+    const suspiciousPaths = detectOutOfProjectPaths(command, projectRoot);
+    if (suspiciousPaths.length > 0) {
+      process.stdout.write(
+        `  ⚠ Command references paths outside project: ${suspiciousPaths.join(', ')}\n`,
+      );
     }
+
+    // ── Step 3: Non-TTY safety — only allow safe commands ─────────────────
+    if (!process.stdin.isTTY && risk !== 'safe') {
+      return {
+        success: false,
+        output: '',
+        error: 'Cannot run non-safe commands in non-interactive (piped) mode',
+      };
+    }
+
+    // ── Step 4: Confirmation based on risk ─────────────────────────────────
+    // Safe commands auto-approve; normal commands require user confirmation
+    if (risk === 'normal') {
+      const confirmed = await confirmAction(`Run command: ${command}`);
+      if (!confirmed) {
+        return { success: false, output: '', error: 'User cancelled command execution' };
+      }
+    }
+
+    // ── Step 5: Execute with sanitized environment ────────────────────────
+    const cleanEnv = sanitizeEnvironment();
 
     return new Promise((resolve) => {
       const child = exec(command, {
@@ -56,6 +88,7 @@ export const runCommandTool: Tool = {
         timeout: TIMEOUT_MS,
         maxBuffer: 1024 * 1024, // 1MB
         shell: process.platform === 'win32' ? 'powershell.exe' : '/bin/sh',
+        env: cleanEnv,
       }, (error, stdout, stderr) => {
         if (error) {
           if (error.killed) {
