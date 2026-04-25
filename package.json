@@ -1,6 +1,6 @@
 {
   "name": "openmerlin",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Production CLI coding agent — connects to any AI",
   "type": "module",
   "main": "./dist/index.js",
