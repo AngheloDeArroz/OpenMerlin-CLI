@@ -35,7 +35,7 @@ const DANGEROUS_PATTERNS: RegExp[] = [
   /\bshred\b/,                        // shred
   /\bmkfs\b/,                         // mkfs.*
   /\bdd\s+if=/,                       // dd if=
-  /:()\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;/, // fork bomb
+  /:\s*\(\s*\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;/, // fork bomb
   /\bsudo\b/,                         // sudo (privilege escalation)
   /\bchmod\s+777/,                    // chmod 777
   /\bchown\s+-R\b/,                   // recursive chown
